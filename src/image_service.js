@@ -8,7 +8,7 @@ class AgsImageService extends AgsBaseService {
     return urljoin('/' + this.data.name, 'ImageServer');
   }
 
-  getLayers() {
+  getLayers(req) {
     return {
       Layer: [
         {
@@ -34,20 +34,14 @@ class AgsImageService extends AgsBaseService {
   }
 
   getMapUrl(req, token) {
-    let bbox = req.query.bbox || req.query.BBOX;
-    let crs = (req.query.crs || req.query.CRS || '').replace('EPSG:', '');
-    let width = req.query.width || req.query.WIDTH;
-    let height = req.query.height || req.query.HEIGHT;
-    let format = (req.query.format || req.query.FORMAT || '')
-      .replace('image/', '');
-
-    return urljoin(this.url, 'exportImage') + '?' + querystring.stringify({
+    let params = this.getWMSParams(req);
+    return urljoin(this.url, 'export') + '?' + querystring.stringify({
       f: 'image',
-      bbox: bbox,
-      size: width + ',' + height,
-      imageSR: crs,
-      bboxSR: crs,
-      format: format,
+      bbox: params.bbox,
+      size: params.width + ',' + params.height,
+      imageSR: params.crs.replace('EPSG:', ''),
+      bboxSR: params.crs.replace('EPSG:', ''),
+      format: params.format.replace('image/', ''),
       token: token
     });
   }

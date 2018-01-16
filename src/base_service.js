@@ -48,7 +48,7 @@ class AgsBaseService {
   }
 
   getBBox() {
-    let extent = this.data.extent;
+    let extent = this.data.extent || this.data.fullExtent;
     let crs = 'EPSG:' + extent.spatialReference.latestWkid;
     return {
       BoundingBox: [
@@ -151,7 +151,7 @@ class AgsBaseService {
                   }
                 ]
               },
-              this.getLayers()
+              this.getLayers(req)
             ]
           }
         ]
@@ -161,12 +161,23 @@ class AgsBaseService {
     });
   }
 
+  getWMSParams(req) {
+    return {
+      bbox: req.query.bbox || req.query.BBOX || '',
+      crs: req.query.crs || req.query.CRS || '',
+      width: req.query.width || req.query.WIDTH || '',
+      height: req.query.height || req.query.HEIGHT || '',
+      format: req.query.format || req.query.FORMAT || '',
+      layers: req.query.layers || req.query.LAYERS || ''
+    };
+  }
+
   // Overriden by subclasses.
   getEndpoint() {
     return '/';
   }
 
-  getLayers() {
+  getLayers(req) {
     return {
       Layer: []
     };
