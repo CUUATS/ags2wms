@@ -1,5 +1,6 @@
 const express = require('express');
 const request = require('request');
+const utils = require('./utils.js');
 const AgsImageService = require('./image_service.js');
 const AgsMapService = require('./map_service.js');
 
@@ -60,13 +61,15 @@ class AgsProxy {
     this.app.get(service.getEndpoint(), (req, res) => {
       let svc = req.query.service || req.query.SERVICE;
       let op = req.query.request || req.query.REQUEST;
-      if (svc != 'WMS') return res.status(500).send('Invalid Service');
+      if (svc != 'WMS') return res.type('xml').send(
+        utils.exception('Invalid Service'));
       if (op == 'GetCapabilities') {
         res.type('xml').send(service.getCapabilities(req));
       } else if (op == 'GetMap') {
         request(service.getMapUrl(req, this.token)).pipe(res);
       } else {
-        res.status(500).send('Invalid Request');
+        res.type('xml').send(utils.exception(
+          'Operation Not Supported', 'OperationNotSupported'));
       }
     });
   }
