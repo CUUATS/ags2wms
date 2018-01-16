@@ -35,7 +35,7 @@ class AgsImageService extends AgsBaseService {
 
   getMapUrl(req, token) {
     let bbox = req.query.bbox || req.query.BBOX;
-    let crs = (req.query.crs || req.query.CRS).replace('EPSG:', '');
+    let crs = (req.query.crs || req.query.CRS || '').replace('EPSG:', '');
     let width = req.query.width || req.query.WIDTH;
     let height = req.query.height || req.query.HEIGHT;
     let format = (req.query.format || req.query.FORMAT || '')

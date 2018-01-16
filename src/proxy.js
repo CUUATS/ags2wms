@@ -66,7 +66,14 @@ class AgsProxy {
       if (op == 'GetCapabilities') {
         res.type('xml').send(service.getCapabilities(req));
       } else if (op == 'GetMap') {
-        request(service.getMapUrl(req, this.token)).pipe(res);
+        let agsReq = request(service.getMapUrl(req, this.token));
+        agsReq.on('response', (agsRes) => {
+          if (agsRes.statusCode !== 200) {
+            res.type('xml').send(utils.exception('Upstream Error'));
+          } else {
+            agsReq.pipe(res);
+          }
+        });
       } else {
         res.type('xml').send(utils.exception(
           'Operation Not Supported', 'OperationNotSupported'));
