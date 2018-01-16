@@ -35,7 +35,7 @@ class AgsImageService extends AgsBaseService {
 
   getMapUrl(req, token) {
     let params = this.getWMSParams(req);
-    return urljoin(this.url, 'export') + '?' + querystring.stringify({
+    return urljoin(this.url, 'exportImage') + '?' + querystring.stringify({
       f: 'image',
       bbox: params.bbox,
       size: params.width + ',' + params.height,
