@@ -77,6 +77,8 @@ class AgsMapService extends AgsBaseService {
       format: params.format.replace('image/', ''),
       layers: (/DEFAULT/.test(params.layers)) ?
         'include:' : 'show:' + params.layers,
+      transparent: (params.transparent.toLowerCase() === 'true') ?
+        'true' : 'false',
       token: token
     });
   }
