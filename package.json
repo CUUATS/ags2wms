@@ -1,0 +1,19 @@
+{
+  "name": "ags2wms",
+  "version": "0.1.0",
+  "description": "ArcGIS Server to Web Map Service (WMS) proxy server",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matt Yoder",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "epsg": "^0.3.0",
+    "express": "^4.16.2",
+    "proj4": "^2.4.4",
+    "request": "^2.83.0",
+    "url-join": "^2.0.5",
+    "xml": "^1.0.1"
+  }
+}
