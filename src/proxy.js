@@ -1,5 +1,6 @@
 const express = require('express');
 const request = require('request');
+const urljoin = require('url-join');
 const utils = require('./utils.js');
 const AgsImageService = require('./image_service.js');
 const AgsMapService = require('./map_service.js');
