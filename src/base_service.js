@@ -82,7 +82,8 @@ class AgsBaseService {
   }
 
   getCapabilities(req) {
-    let baseUrl = req.protocol + '://' + req.get('host');
+    let baseUrl = req.protocol + '://' + req.get('host') +
+      (req.get('X-URI-Prefix') || '');
     return xml([
       {
         WMS_Capabilities: [
