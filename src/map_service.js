@@ -66,7 +66,7 @@ class AgsMapService extends AgsBaseService {
     };
   }
 
-  getMapUrl(req, token) {
+  getMapUrl(req) {
     let params = this.getWMSParams(req);
     return urljoin(this.url, 'export') + '?' + querystring.stringify({
       f: 'image',
@@ -78,8 +78,7 @@ class AgsMapService extends AgsBaseService {
       layers: (/DEFAULT/.test(params.layers)) ?
         'include:' : 'show:' + params.layers,
       transparent: (params.transparent.toLowerCase() === 'true') ?
-        'true' : 'false',
-      token: token
+        'true' : 'false'
     });
   }
 }

@@ -33,7 +33,7 @@ class AgsImageService extends AgsBaseService {
     };
   }
 
-  getMapUrl(req, token) {
+  getMapUrl(req) {
     let params = this.getWMSParams(req);
     return urljoin(this.url, 'exportImage') + '?' + querystring.stringify({
       f: 'image',
@@ -41,8 +41,7 @@ class AgsImageService extends AgsBaseService {
       size: params.width + ',' + params.height,
       imageSR: params.crs.replace('EPSG:', ''),
       bboxSR: params.crs.replace('EPSG:', ''),
-      format: params.format.replace('image/', ''),
-      token: token
+      format: params.format.replace('image/', '')
     });
   }
 }

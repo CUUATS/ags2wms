@@ -7,38 +7,80 @@ const AgsMapService = require('./map_service.js');
 
 
 class AgsProxy {
-  constructor(baseUrl, token, port) {
-    this.baseUrl = baseUrl;
-    this.token = token;
+  constructor(config) {
+    this.baseUrl = config.url;
+    this.tokenUrl = config.tokenUrl;
+    this.token = config.token;
+    this.user = config.user;
+    this.password = config.password;
     this.status = {
       pendingRequests: 0,
       services: []
     };
-    this.port = port;
+    this.port = config.port || 8000;
     this.app = express();
     this.app.listen(this.port, () => {
       console.log('Listening on port ' + this.port);
     });
   }
 
+  ensureToken(cb) {
+    if (this.token) return cb(null);
+    if (!this.user || !this.password) return cb(null);
+
+    let tokenUrl = this.tokenUrl ||
+      this.baseUrl.split('/rest/')[0] + '/tokens/';
+
+    request.post({
+      url: tokenUrl,
+      form: {
+        username: this.user,
+        password: this.password,
+        client: 'requestip',
+        expiration: 525600,
+        f: 'json'
+      }
+    }, (err, res, body) => {
+      if (err) return cb(err);
+      let data = JSON.parse(body);
+      if (data.error) cb(data.error.message);
+      this.token = data.token
+      cb(null);
+    });
+  }
+
+  get(uri, cb) {
+    this.ensureToken((tokenErr) => {
+      if (tokenErr) return cb(tokenErr, null);
+      let agsReq = request((this.token) ? uri + '&token=' + this.token : uri);
+      agsReq.on('response', (agsRes) => {
+        if (agsRes.statusCode !== 200) {
+          cb('HTTP error', null);
+        } else if (/text\/plain/.test(agsRes.headers['content-type'])) {
+          let raw = '';
+          agsReq.on('data', (chunk) => raw += chunk);
+          agsReq.on('end', () => {
+            let data = JSON.parse(raw);
+            if (data.error && data.error.code === 498) {
+              this.token = undefined;
+              this.get(uri, cb);
+            } else {
+              cb(null, data);
+            }
+          });
+        } else {
+          cb(null, agsReq);
+        }
+      });
+    });
+  }
+
   discover(url) {
     this.status.pendingRequets += 1;
     url = url || this.baseUrl;
-    request({
-      uri: url,
-      qs: {
-        f: 'json',
-        token: this.token
-      }
-    }, (err, res, body) => {
+    this.get(url + '?f=json', (err, data) => {
       if (err) {
-        console.log('HTTP error at ' + url + ': ' + err);
-        return;
-      }
-
-      let data = JSON.parse(body);
-      if (data.error) {
-        console.log('Error response at ' + url + ': ' + data.error.message);
+        console.log('Error at ' + url + ': ' + err);
         return;
       }
 
@@ -67,9 +109,8 @@ class AgsProxy {
       if (op == 'GetCapabilities') {
         res.type('xml').send(service.getCapabilities(req));
       } else if (op == 'GetMap') {
-        let agsReq = request(service.getMapUrl(req, this.token));
-        agsReq.on('response', (agsRes) => {
-          if (agsRes.statusCode !== 200) {
+        this.get(service.getMapUrl(req), (err, agsReq) => {
+          if (err) {
             res.type('xml').send(utils.exception('Upstream Error'));
           } else {
             agsReq.pipe(res);

@@ -185,7 +185,7 @@ class AgsBaseService {
     };
   }
 
-  getMapUrl(req, token) {
+  getMapUrl(req) {
     return '';
   }
 }
