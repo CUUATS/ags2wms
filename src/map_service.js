@@ -71,6 +71,7 @@ class AgsMapService extends AgsBaseService {
     return urljoin(this.url, 'export') + '?' + querystring.stringify({
       f: 'image',
       bbox: params.bbox,
+      dpi: params.dpi,
       size: params.width + ',' + params.height,
       imageSR: params.crs.replace('EPSG:', ''),
       bboxSR: params.crs.replace('EPSG:', ''),

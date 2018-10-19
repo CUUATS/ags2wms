@@ -170,7 +170,8 @@ class AgsBaseService {
       height: req.query.height || req.query.HEIGHT || '',
       format: req.query.format || req.query.FORMAT || '',
       layers: req.query.layers || req.query.LAYERS || '',
-      transparent: req.query.transparent || req.query.TRANSPARENT || ''
+      transparent: req.query.transparent || req.query.TRANSPARENT || '',
+      dpi: req.query.dpi || req.query.DPI || '96',
     };
   }
 
